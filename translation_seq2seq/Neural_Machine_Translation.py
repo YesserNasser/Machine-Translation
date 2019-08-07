@@ -22,7 +22,6 @@ def unicode_to_ascii(s):
     return ''.join(c for c in unicodedata.normalize('NFD', s)
         if unicodedata.category(c) != 'Mn')
 
-
 def preprocess_sentence(s):
     s = unicode_to_ascii(s.lower().strip())
     # creating a space between a word and the punctuation following it
@@ -45,7 +44,6 @@ class LangIndex():
     self.word2idx = {}
     self.idx2word = {}
     self.vocab = set()
-    
     self.create_index()
     
   def create_index(self):
@@ -76,10 +74,10 @@ targ_lang = LangIndex(en for en, ar in lan1_lan2)
 
 # Vectorize the input and target languages
 # Spanish sentences
-input_tensor = [[inp_lang.word2idx[s] for s in sp.split(' ')] for en, sp in lan1_lan2]
+input_tensor = [[inp_lang.word2idx[s] for s in ar.split(' ')] for en, ar in lan1_lan2]
     
 # English sentences
-target_tensor = [[targ_lang.word2idx[s] for s in en.split(' ')] for en, sp in lan1_lan2]
+target_tensor = [[targ_lang.word2idx[s] for s in en.split(' ')] for en, ar in lan1_lan2]
 
 def max_length(tensor):
     return max(len(t) for t in tensor)
@@ -224,43 +222,28 @@ checkpoint = tf.train.Checkpoint(optimizer=optimizer,
 ''' =========================================================================='''
 ''' ============================== Training =================================='''
 EPOCHS = 10
-
 for epoch in range(EPOCHS):
-    start = time.time()
-    
+    start = time.time()  
     hidden = encoder.initialize_hidden_state()
-    total_loss = 0
-    
+    total_loss = 0  
     for (batch, (inp, targ)) in enumerate(dataset):
-        loss = 0
-        
+        loss = 0    
         with tf.GradientTape() as tape:
-            enc_output, enc_hidden = encoder(inp, hidden)
-            
-            dec_hidden = enc_hidden
-            
+            enc_output, enc_hidden = encoder(inp, hidden)     
+            dec_hidden = enc_hidden   
             dec_input = tf.expand_dims([targ_lang.word2idx['<start>']] * BATCH_SIZE, 1)       
-            
             # Teacher forcing - feeding the target as the next input
             for t in range(1, targ.shape[1]):
                 # passing enc_output to the decoder
-                predictions, dec_hidden, _ = decoder(dec_input, dec_hidden, enc_output)
-                
+                predictions, dec_hidden, _ = decoder(dec_input, dec_hidden, enc_output)    
                 loss += loss_function(targ[:, t], predictions)
-                
                 # using teacher forcing
                 dec_input = tf.expand_dims(targ[:, t], 1)
-        
         batch_loss = (loss / int(targ.shape[1]))
-        
         total_loss += batch_loss
-        
         variables = encoder.variables + decoder.variables
-        
         gradients = tape.gradient(loss, variables)
-        
         optimizer.apply_gradients(zip(gradients, variables))
-        
         if batch % 100 == 0:
             print('Epoch {} Batch {} Loss {:.4f}'.format(epoch + 1,
                                                          batch,
@@ -268,78 +251,52 @@ for epoch in range(EPOCHS):
     # saving (checkpoint) the model every 2 epochs
     if (epoch + 1) % 2 == 0:
       checkpoint.save(file_prefix = checkpoint_prefix)
-    
     print('Epoch {} Loss {:.4f}'.format(epoch + 1,
                                         total_loss / N_BATCH))
     print('Time taken for 1 epoch {} sec\n'.format(time.time() - start))
-
 ''' =========================================================================='''
 ''' =========================================================================='''
 ''' ============================= Evalution =================================='''
-
 def evaluate(sentence, encoder, decoder, inp_lang, targ_lang, max_length_inp, max_length_targ):
     attention_plot = np.zeros((max_length_targ, max_length_inp))
-    
     sentence = preprocess_sentence(sentence)
-
     inputs = [inp_lang.word2idx[i] for i in sentence.split(' ')]
     inputs = tf.keras.preprocessing.sequence.pad_sequences([inputs], maxlen=max_length_inp, padding='post')
     inputs = tf.convert_to_tensor(inputs)
-    
     result = ''
-
     hidden = [tf.zeros((1, units))]
     enc_out, enc_hidden = encoder(inputs, hidden)
-
     dec_hidden = enc_hidden
     dec_input = tf.expand_dims([targ_lang.word2idx['<start>']], 0)
-
     for t in range(max_length_targ):
-        predictions, dec_hidden, attention_weights = decoder(dec_input, dec_hidden, enc_out)
-        
+        predictions, dec_hidden, attention_weights = decoder(dec_input, dec_hidden, enc_out)      
         # storing the attention weights to plot later on
         attention_weights = tf.reshape(attention_weights, (-1, ))
         attention_plot[t] = attention_weights.numpy()
-
         predicted_id = tf.argmax(predictions[0]).numpy()
-
         result += targ_lang.idx2word[predicted_id] + ' '
-
         if targ_lang.idx2word[predicted_id] == '<end>':
             return result, sentence, attention_plot
-        
         # the predicted ID is fed back into the model
         dec_input = tf.expand_dims([predicted_id], 0)
-
     return result, sentence, attention_plot
-
-
 ''' =========================================================================='''
 ''' =========================================================================='''
 ''' ======================== Attention Plot =================================='''
-
 def plot_attention(attention, sentence, predicted_sentence):
     fig = plt.figure(figsize=(10,10))
     ax = fig.add_subplot(1, 1, 1)
     ax.matshow(attention, cmap='viridis')
-    
     fontdict = {'fontsize': 14}
-    
     ax.set_xticklabels([''] + sentence, fontdict=fontdict, rotation=90)
     ax.set_yticklabels([''] + predicted_sentence, fontdict=fontdict)
-
     plt.show()
-
 def translate(sentence, encoder, decoder, inp_lang, targ_lang, max_length_inp, max_length_targ):
-    result, sentence, attention_plot = evaluate(sentence, encoder, decoder, inp_lang, targ_lang, max_length_inp, max_length_targ)
-        
+    result, sentence, attention_plot = evaluate(sentence, encoder, decoder, inp_lang, targ_lang, max_length_inp, max_length_targ)   
     print('Input: {}'.format(sentence))
     print('Predicted translation: {}'.format(result))
-    
     attention_plot = attention_plot[:len(result.split(' ')), :len(sentence.split(' '))]
     plot_attention(attention_plot, sentence.split(' '), result.split(' '))
-
 # restoring the latest checkpoint in checkpoint_dir
 checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
-
 translate('هل يمكنك إيصالي إلى المحطة؟', encoder, decoder, inp_lang, targ_lang, max_length_inp, max_length_targ)
