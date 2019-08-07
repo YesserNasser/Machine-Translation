@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jul  30 12:44:50 2019
+@author: Yesser H. Nasser
+"""
 
 import tensorflow as tf
 import matplotlib.pyplot as plt
