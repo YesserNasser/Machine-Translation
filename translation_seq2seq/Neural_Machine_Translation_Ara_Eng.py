@@ -3,7 +3,7 @@
 ''' source: (Yash Gaurkar ) 
 https://github.com/tensorflow/tensorflow/blob/r1.13/tensorflow/contrib/eager/python/examples/nmt_with_attention/nmt_with_attention.ipynb
 
-Tuned the code for my own application howevere the credit goes to Yash Gaurkar.
+I used the code for my own application howevere the credit goes to Yash Gaurkar.
 This was a practice on how to use Encoder Decoder attention for machine translation
 '''
 ''' ======================================================================= '''
@@ -331,7 +331,7 @@ def translate(sentence, encoder, decoder, inp_lang, targ_lang, max_length_inp, m
 # restoring the latest checkpoint in checkpoint_dir
 checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
 
-translate('هل يمكنك إيصالي إلى المحطة؟', encoder, decoder, inp_lang, targ_lang, max_length_inp, max_length_targ)
+translate('ضمّت الولاياتُ المتحدةُ الأمريكيةُ تكساسَ عام 1845', encoder, decoder, inp_lang, targ_lang, max_length_inp, max_length_targ)
 
 '''============================================================================'''
 '''=======================Elapsed time (s)====================================='''
