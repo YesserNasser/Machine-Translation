@@ -2,7 +2,6 @@
 ''' ======================================================================= '''
 ''' source: (Yash Gaurkar ) 
 https://github.com/tensorflow/tensorflow/blob/r1.13/tensorflow/contrib/eager/python/examples/nmt_with_attention/nmt_with_attention.ipynb
-
 I used the code for my own application howevere the credit goes to Yash Gaurkar.
 This was a practice on how to use Encoder Decoder attention for machine translation
 '''
