@@ -27,7 +27,6 @@ def unicode_to_ascii(s):
     return ''.join(c for c in unicodedata.normalize('NFD', s)
         if unicodedata.category(c) != 'Mn')
 
-
 def preprocess_sentence(s):
     s = unicode_to_ascii(s.lower().strip())
     # creating a space between a word and the punctuation following it
