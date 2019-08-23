@@ -330,21 +330,4 @@ def translate(sentence, encoder, decoder, inp_lang, targ_lang, max_length_inp, m
 # restoring the latest checkpoint in checkpoint_dir
 checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
 
-translate('ضمّت الولاياتُ المتحدةُ الأمريكيةُ تكساسَ عام 1845', encoder, decoder, inp_lang, targ_lang, max_length_inp, max_length_targ)
-
-'''============================================================================'''
-'''=======================Elapsed time (s)====================================='''
-import time
-from datetime import timedelta
-
-start_time = time.time()
-
-#
-# Perform lots of computations.
-#
-
-elapsed_time_secs = time.time() - start_time
-
-msg = "Execution took: %s secs (Wall clock time)" % timedelta(seconds=round(elapsed_time_secs))
-
-print(msg)    
+translate('ضمّت الولاياتُ المتحدةُ الأمريكيةُ تكساسَ عام 1845', encoder, decoder, inp_lang, targ_lang, max_length_inp, max_length_targ)   
