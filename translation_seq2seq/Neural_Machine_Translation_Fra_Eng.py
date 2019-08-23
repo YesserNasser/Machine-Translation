@@ -3,7 +3,7 @@
 ''' source: (Yash Gaurkar ) 
 https://github.com/tensorflow/tensorflow/blob/r1.13/tensorflow/contrib/eager/python/examples/nmt_with_attention/nmt_with_attention.ipynb
 
-Tuned the code for my own application howevere the credit goes to Yash Gaurkar.
+I used the code for my own application howevere the credit goes to Yash Gaurkar.
 This was a practice on how to use Encoder Decoder attention for machine translation
 '''
 ''' ======================================================================= '''
@@ -23,7 +23,6 @@ start_time = time.time()
 ''' =========================================================================='''
 ''' =========================================================================='''
 ''' ==================== Functions for data processing ======================='''
-
 # Converts the unicode file to ascii
 def unicode_to_ascii(s):
     return ''.join(c for c in unicodedata.normalize('NFD', s)
@@ -337,7 +336,6 @@ translate('Un vrai scientifique ne penserait pas de cette manière.', encoder, d
 
 '''============================================================================'''
 '''=======================Elapsed time (s)====================================='''
-
 elapsed_time_secs = time.time() - start_time
 msg = "Execution took: %s secs (Wall clock time)" % timedelta(seconds=round(elapsed_time_secs))
 print(msg)    
